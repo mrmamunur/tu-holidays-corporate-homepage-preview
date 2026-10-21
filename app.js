@@ -95,6 +95,39 @@
     setTimeout(play, n * 700);
   });
 
+  // client reviews: one review at a time in one column. Arrows, counter and swipe; no auto-change so visitors can read. Without JS they stack.
+  document.querySelectorAll("[data-rslider]").forEach(function (box) {
+    var slides = box.querySelectorAll(".rs-slide");
+    if (slides.length < 2) return;
+    var cur = 0, counter = box.querySelector("[data-cur]");
+    box.classList.add("is-ready");
+    var show = function (k) {
+      cur = (k + slides.length) % slides.length;
+      slides.forEach(function (s, i) {
+        s.classList.toggle("is-active", i === cur);
+        s.classList.toggle("is-before", i < cur);
+        s.setAttribute("aria-hidden", i === cur ? "false" : "true");
+        s.setAttribute("role", "group"); s.setAttribute("aria-roledescription", "review");
+        s.setAttribute("aria-label", (i + 1) + " of " + slides.length);
+      });
+      if (counter) counter.textContent = cur + 1;
+    };
+    show(0);
+    box.querySelectorAll(".rs-btn").forEach(function (b) {
+      b.addEventListener("click", function () { show(cur + parseInt(b.getAttribute("data-dir"), 10)); });
+    });
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") show(cur - 1); else if (e.key === "ArrowRight") show(cur + 1);
+    });
+    var x0 = null;
+    box.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    box.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  });
+
   // client-logo strip: static centred row while the logos fit; when they do not, a slow looping rail (pauses on hover, off for reduced motion)
   var rail = document.querySelector(".logo-rail");
   if (rail && !reduce) {

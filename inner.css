@@ -347,3 +347,56 @@
 .sl .sl-slide.is-active { opacity: 1; }
 .sl .sl-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @media (prefers-reduced-motion: reduce) { .sl .sl-slide { transition: none; } }
+
+
+/* ---------- client reviews + articles on the homepage (2026-10-21) ----------
+   Both sections are data-driven (content/reviews.json, content/articles.json) and absent from the page until real content exists. */
+.rslider { max-width: 880px; margin-inline: auto; touch-action: pan-y; }
+.rs-stage { display: block; }
+.rslider .rs-slide + .rs-slide { margin-top: 24px; }   /* no JavaScript: reviews stack in one column */
+.rslider.is-ready .rs-stage { display: grid; }
+.rslider.is-ready .rs-stage { overflow: hidden; }
+.rslider.is-ready .rs-slide { grid-area: 1 / 1; margin-top: 0; opacity: 0; visibility: hidden; transform: translateX(56px); transition: opacity .5s ease, transform .5s cubic-bezier(.2, .7, .2, 1), visibility .5s; }
+.rslider.is-ready .rs-slide.is-before { transform: translateX(-56px); }   /* reviews already passed wait on the left, the next ones on the right: moving on slides right to left */
+.rslider.is-ready .rs-slide.is-active { opacity: 1; visibility: visible; transform: none; }
+.rslider .rcard { padding: clamp(32px, 4vw, 56px); }
+.rslider .rcard blockquote p { font-size: clamp(22px, 2.4vw, 30px); }
+.rs-ctrl { display: flex; align-items: center; justify-content: center; gap: 22px; margin-top: 28px; }
+.rslider:not(.is-ready) .rs-ctrl { display: none; }
+.rs-btn { width: 52px; height: 52px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); font: 700 22px/1 var(--sans); cursor: pointer; transition: background .25s, color .25s; }
+.rs-btn:hover { background: var(--ink); color: var(--gold); }
+.rs-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.rs-count { font-size: 17px; font-weight: 700; color: var(--ink); min-width: 4.5em; text-align: center; }
+.rcard { margin: 0; position: relative; display: flex; flex-direction: column; background: var(--white); border: 1px solid var(--line); padding: clamp(28px, 3vw, 40px); }
+.rcard::before { content: ""; position: absolute; left: -1px; right: -1px; top: -1px; height: 4px; background: var(--gold); }
+.rv-mark { font-family: var(--serif); font-size: 84px; line-height: .6; color: var(--gold); height: 40px; display: block; }
+.rcard blockquote { margin: 0 0 28px; }
+.rcard blockquote p { font-family: var(--serif); font-weight: 500; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.4; color: var(--ink); }
+.rcard figcaption { margin-top: auto; padding-top: 22px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.rv-logo-slot { display: block; height: 30px; margin-bottom: 12px; }
+.rv-logo { height: 30px; width: auto; display: block; }
+.rv-trip-slot { display: block; }
+.rv-logo-slot:empty, .rv-trip-slot:empty { display: none; }   /* all slides share the tallest slide's height, so no spacer is needed */
+.rcard figcaption b { font-size: 18px; color: var(--ink); }
+.rv-role { color: var(--muted); font-size: 16px; }
+.rv-src { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.rv-trip { margin-top: 12px; font-weight: 700; font-size: 16px; color: var(--ink); text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 5px; align-self: flex-start; }
+.rv-trip:hover { text-decoration-color: var(--ink); }
+
+.agrid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 32px); }
+.acard { display: flex; flex-direction: column; background: var(--white); border: 1px solid var(--line); transition: transform .4s, box-shadow .4s; }
+.acard:hover { transform: translateY(-6px); box-shadow: 0 34px 56px -36px rgba(13, 20, 17, .5); }
+.ac-photo { display: block; overflow: hidden; }
+.ac-photo figure { margin: 0; aspect-ratio: 3 / 2; background: var(--paper-2); overflow: hidden; }
+.ac-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s cubic-bezier(.2, .7, .2, 1); }
+.acard:hover .ac-photo img { transform: scale(1.05); }
+.ac-body { padding: 24px 26px 28px; display: flex; flex-direction: column; flex: 1; }
+.ac-meta { display: flex; gap: 14px; align-items: center; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.ac-meta span { font-weight: 700; color: var(--gold-deep); }
+.ac-body h3 { font-family: var(--serif); font-weight: 500; font-size: clamp(22px, 2vw, 27px); line-height: 1.2; }
+.ac-body h3 a { color: inherit; text-decoration: none; }
+.ac-body h3 a:hover { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 5px; }
+.ac-sum { margin: 12px 0 22px; color: var(--muted); font-size: 17px; }
+.ac-body .link-arrow { margin-top: auto; align-self: flex-start; }
+@media (max-width: 900px) { .agrid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .acard, .ac-photo img, .rslider.is-ready .rs-slide { transition: none; } }
