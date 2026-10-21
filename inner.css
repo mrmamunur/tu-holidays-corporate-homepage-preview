@@ -400,3 +400,6 @@
 .ac-body .link-arrow { margin-top: auto; align-self: flex-start; }
 @media (max-width: 900px) { .agrid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .acard, .ac-photo img, .rslider.is-ready .rs-slide { transition: none; } }
+
+/* design-preview note shown above sample reviews/articles (content/*.json: show_placeholders) */
+.ph-note { grid-column: 1 / -1; display: inline-block; justify-self: start; background: var(--gold); color: var(--ink); font: 700 15px/1.4 var(--sans); padding: 8px 14px; margin: 0 0 22px; }
