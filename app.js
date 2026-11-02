@@ -29,27 +29,66 @@
     items.forEach(function (el) { io.observe(el); });
   }
 
-  // enquiry form: validation only; nothing is sent in this preview
+  // one enquiry form, two modes: "proposal" or "appointment" (tabs, or #appointment / #proposal in the address). Validation only; nothing is sent in this preview.
   var form = document.getElementById("enquiry");
-  var thanks = document.getElementById("thanks");
-  if (form) form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var missing = [];
-    form.querySelectorAll("[required]").forEach(function (f) {
-      var ok = f.type === "checkbox" ? f.checked : f.value.trim() !== "";
-      if (f.type === "email" && ok) ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value);
-      f.setAttribute("aria-invalid", ok ? "false" : "true");
-      f.style.borderColor = ok ? "" : "#b3261e";
-      if (!ok) missing.push(f);
+  if (form) {
+    var thanks = form.querySelector(".thanks");
+    var card = form.closest(".form-card");
+    var tabs = card.querySelectorAll(".mode-tab");
+    var setMode = function (m) {
+      form.setAttribute("data-mode", m);
+      tabs.forEach(function (t) { var on = t.getAttribute("data-mode") === m; t.classList.toggle("is-on", on); t.setAttribute("aria-selected", on ? "true" : "false"); });
+      form.querySelectorAll("[data-for]").forEach(function (box) {
+        var on = box.getAttribute("data-for") === m;
+        box.hidden = !on;
+        box.querySelectorAll("input, select, textarea").forEach(function (i) { i.disabled = !on; i.style.borderColor = ""; i.removeAttribute("aria-invalid"); });
+      });
+      card.querySelectorAll("[data-t-" + m + "]").forEach(function (el) { el.textContent = el.getAttribute("data-t-" + m); });
+      thanks.classList.remove("show");
+    };
+    tabs.forEach(function (t) { t.addEventListener("click", function () { setMode(t.getAttribute("data-mode")); }); });
+    var fromHash = function () {
+      if (location.hash === "#appointment") { setMode("appointment"); var sec = document.getElementById("proposal"); if (sec) sec.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }
+      else if (location.hash === "#proposal") setMode("proposal");
+    };
+    window.addEventListener("hashchange", fromHash);
+    document.querySelectorAll('a[href="#appointment"], a[href="#proposal"]').forEach(function (a) {
+      a.addEventListener("click", function () { setMode(a.getAttribute("href") === "#appointment" ? "appointment" : "proposal"); });
     });
-    thanks.classList.add("show");
-    if (missing.length) {
-      thanks.textContent = "Please complete the highlighted fields.";
-      missing[0].focus();
-      return;
-    }
-    thanks.textContent = "Thank you. This is a design preview, so nothing was sent.";
-  });
+    fromHash();
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var missing = [];
+      form.querySelectorAll("[required]").forEach(function (f) {
+        if (f.disabled) return;
+        var ok = f.type === "checkbox" ? f.checked : f.value.trim() !== "";
+        if (f.type === "email" && ok) ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value);
+        f.setAttribute("aria-invalid", ok ? "false" : "true");
+        f.style.borderColor = ok ? "" : "#b3261e";
+        if (!ok) missing.push(f);
+      });
+      thanks.classList.add("show");
+      if (missing.length) {
+        thanks.textContent = "Please complete the highlighted fields.";
+        missing[0].focus();
+        return;
+      }
+      thanks.textContent = "Thank you. This is a design preview, so nothing was sent.";
+    });
+  }
+
+  // floating WhatsApp / appointment button: opens a small panel; Escape, outside click or a choice closes it
+  var waBox = document.getElementById("wafloat");
+  if (waBox) {
+    var waBtn = waBox.querySelector(".wa-btn"), waPanel = document.getElementById("wa-panel");
+    var waSet = function (open) {
+      waPanel.hidden = !open; waBtn.setAttribute("aria-expanded", open ? "true" : "false"); waBox.classList.toggle("is-open", open);
+    };
+    waBtn.addEventListener("click", function () { waSet(waPanel.hidden); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !waPanel.hidden) { waSet(false); waBtn.focus(); } });
+    document.addEventListener("click", function (e) { if (!waPanel.hidden && !waBox.contains(e.target)) waSet(false); });
+    waPanel.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", function () { waSet(false); }); });
+  }
 
   // hero planner: carry the choices into the proposal form, then jump to it
   var planner = document.getElementById("planner");

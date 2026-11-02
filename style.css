@@ -357,7 +357,7 @@ h2.h-serif { font-size: clamp(34px, 4.4vw, 58px); }
 /* mobile action bar */
 .mbar { display: none; }
 @media (max-width: 900px) {
-  .mbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: 1fr 1.1fr 1.7fr; background: var(--ink); border-top: 1px solid var(--line-dark); transform: translateY(105%); transition: transform .35s ease; padding-bottom: env(safe-area-inset-bottom); }
+  .mbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: .75fr 1fr 1.15fr 1.3fr; background: var(--ink); border-top: 1px solid var(--line-dark); transform: translateY(105%); transition: transform .35s ease; padding-bottom: env(safe-area-inset-bottom); }
   .mbar.show { transform: none; }
   .mbar a { display: flex; align-items: center; justify-content: center; min-height: 58px; padding: 0 10px; color: var(--white); text-decoration: none; font-weight: 700; font-size: 15px; text-align: center; border-right: 1px solid var(--line-dark); }
   .mbar a.gold { background: var(--gold); color: var(--ink); border-right: 0; }

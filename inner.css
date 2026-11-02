@@ -403,3 +403,115 @@
 
 /* design-preview note shown above sample reviews/articles (content/*.json: show_placeholders) */
 .ph-note { grid-column: 1 / -1; display: inline-block; justify-self: start; background: var(--gold); color: var(--ink); font: 700 15px/1.4 var(--sans); padding: 8px 14px; margin: 0 0 22px; }
+
+
+/* ---------- hero photo frame, homepage (2026-11-02) ----------
+   The slider photos sit in a cream gallery frame: matte, thin gold line, a gold outline offset behind it, deep shadow,
+   caption as a plate under the photo. On hover the offset outline slides in and the shadow deepens (the frame itself never moves).
+   To undo: delete this block, or restore inner.css.before-hero-frame-2026-11-02. */
+.hero .hero-photo { overflow: visible; padding: 0 clamp(24px, 3.4vw, 60px) 0 14px; box-sizing: border-box; }
+.hero .hs-stack {
+  position: relative; background: var(--white); padding: 14px 14px 0; border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(227, 180, 34, .7), 0 38px 80px -22px rgba(0, 0, 0, .7), 0 0 90px -20px rgba(227, 180, 34, .25);
+  transition: box-shadow .5s ease;
+}
+.hero .hs-stack::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border: 2px solid var(--gold); border-radius: 4px;
+  transform: translate(18px, 18px); transition: transform .5s cubic-bezier(.2, .7, .2, 1);
+}
+.hero .hslide img { outline: 1px solid rgba(160, 120, 14, .75); outline-offset: 6px; border-radius: 1px; }
+.hero .hslide .hero-credit { margin: 0; padding: 20px 4px 16px; color: var(--ink); font-size: 14px; font-weight: 500; line-height: 1.35; text-align: left; justify-content: flex-start; background: transparent; }
+.hero .hero-photo:hover .hs-stack, .hero .hero-photo:focus-within .hs-stack {
+  box-shadow: 0 0 0 1px var(--gold), 0 46px 90px -22px rgba(0, 0, 0, .8), 0 0 110px -16px rgba(227, 180, 34, .4);
+}
+.hero .hero-photo:hover .hs-stack::before, .hero .hero-photo:focus-within .hs-stack::before { transform: translate(8px, 8px); }
+@media (max-width: 900px) {
+  .hero .hero-photo { padding: 10px calc(var(--gutter) + 12px) 34px var(--gutter); }
+  .hero .hslide .hero-credit { padding: 16px 4px 14px; background: transparent; }
+  .hero .hs-stack::before { transform: translate(12px, 12px); }
+}
+@media (prefers-reduced-motion: reduce) { .hero .hs-stack, .hero .hs-stack::before { transition: none; } }
+@media (min-width: 901px) { .hero .hero-photo { width: clamp(420px, 52vw, 800px); } }
+
+
+/* ---------- boss feedback round, 2026-11-02 (our colours kept) ----------
+   Topbar: tagline left, WhatsApp button carries the number, email is a button; header: second button "Set an appointment";
+   proof strip adapts to 3 or 4 items. To undo: delete this block and restore _backup-2026-11-02/. */
+.topbar .tag { display: flex; align-items: center; gap: 14px; letter-spacing: 0; text-transform: none; font-size: 14px; color: var(--white); }
+.topbar .tag b { font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.topbar .tag .mice { display: inline-flex; align-items: center; gap: 14px; color: var(--muted-dark); }
+.topbar .tag .mice i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex: none; }
+.topbar .contact { margin-left: auto; gap: 12px; }
+.topbar .wa { display: inline-flex; align-items: center; gap: 8px; }
+.topbar .wa span { font-weight: 700; }
+.topbar .mail { background: rgba(255, 253, 248, .14); color: var(--white); font-weight: 700; padding: 6px 14px; border-radius: var(--radius); }
+.topbar .mail:hover { background: var(--white); color: var(--ink); }
+.btn-outline { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn-outline:hover { background: var(--ink); color: var(--white); }
+.nav .btn { padding: 13px 18px; }
+.nav { gap: clamp(14px, 1.8vw, 28px); }
+@media (min-width: 901px) { .hero-proof .wrap { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; } }
+@media (max-width: 1180px) { .topbar .tag .mice { display: none; } }
+@media (max-width: 900px) { .topbar .mail { display: none; } .nav .btn-outline { margin-top: 10px; justify-content: center; } }
+@media (min-width: 901px) {
+  .nav a, .nav .btn { white-space: nowrap; }
+  .nav { gap: clamp(12px, 1.3vw, 22px); }
+  .nav .btn { padding: 12px 16px; font-size: 15px; }
+  .nav .btn .arr { display: none; }
+  .brand img { width: clamp(150px, 14vw, 190px); height: auto; }
+}
+@media (min-width: 901px) and (max-width: 1100px) { .nav .btn-outline { display: none; } }
+.topbar .wa { white-space: nowrap; }
+@media (max-width: 900px) { .topbar .tag { display: none; } .topbar .contact { margin-left: 0; } }
+
+/* ---------- boss feedback, services + client cards (2026-11-02) ---------- */
+.svc h3 small { display: block; margin-top: 6px; font: 600 14px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--gold-deep); }
+.tc-body .stat b { font-size: clamp(20px, 1.9vw, 28px); white-space: nowrap; }
+.tc-body h3 { font-size: clamp(22px, 2.1vw, 28px); }
+@media (min-width: 901px) { .tc-body h3 { min-height: 2.24em; } }
+@media (max-width: 900px) { .mbar a { font-size: 14px; line-height: 1.2; padding: 0 6px; } }
+/* topbar "Set an appointment": shown where the header hides it (tablet and phone) */
+.topbar .apt { display: none; white-space: nowrap; border: 1.5px solid rgba(255, 253, 248, .6); color: var(--white); font-weight: 700; padding: 5px 14px; border-radius: var(--radius); }
+.topbar .apt:hover { background: var(--white); color: var(--ink); border-color: var(--white); }
+@media (max-width: 1100px) { .topbar .apt { display: inline-flex; } }
+@media (max-width: 900px) { .topbar .contact { justify-content: center; gap: 10px; } }
+
+
+/* ---------- floating WhatsApp / appointment button (2026-11-02) ----------
+   Fixed bottom-right. Opens a small panel: chat on WhatsApp or set an appointment. On phones it sits above the quick bar when that shows.
+   To undo: delete this block, the .wafloat markup in build.py and the "floating WhatsApp" block in app.js (or restore _backup-2026-11-02/*before-float*). */
+.wafloat { position: fixed; right: 20px; bottom: 20px; z-index: 70; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; transition: bottom .35s ease; }
+.wa-btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 20px 14px 16px; border: 0; border-radius: 999px; background: #167a41; color: #fff; font: 700 16px/1 var(--sans); cursor: pointer; box-shadow: 0 14px 34px -10px rgba(7, 40, 20, .65), 0 0 0 3px rgba(255, 253, 248, .9); transition: transform .25s, background .25s; position: relative; }
+.wa-btn:hover { background: #0f5e31; transform: translateY(-2px); }
+.wa-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.wa-btn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 0 rgba(22, 122, 65, .55); animation: wa-pulse 2.8s ease-out 1.5s infinite; pointer-events: none; }
+.wafloat.is-open .wa-btn::after { animation: none; }
+@keyframes wa-pulse { 0% { box-shadow: 0 0 0 0 rgba(22, 122, 65, .55); } 70%, 100% { box-shadow: 0 0 0 16px rgba(22, 122, 65, 0); } }
+.wa-panel { width: min(320px, calc(100vw - 40px)); background: var(--white); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 6px; padding: 20px 20px 18px; box-shadow: 0 30px 60px -20px rgba(13, 20, 17, .5); color: var(--ink); }
+.wa-panel[hidden] { display: none; }
+.wa-title { font-family: var(--serif); font-weight: 500; font-size: 24px; line-height: 1.2; }
+.wa-sub { margin: 6px 0 14px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.wa-opt { display: block; padding: 13px 16px; margin-top: 10px; border: 1.5px solid var(--ink); border-radius: var(--radius); text-decoration: none; color: var(--ink); transition: background .25s, color .25s; }
+.wa-opt b { display: block; font-size: 16px; }
+.wa-opt span { display: block; margin-top: 3px; font-size: 14px; line-height: 1.35; opacity: .8; }
+.wa-opt:hover, .wa-opt:focus-visible { background: var(--ink); color: var(--white); }
+.wa-chat { background: #167a41; border-color: #167a41; color: #fff; }
+.wa-chat:hover, .wa-chat:focus-visible { background: #0f5e31; border-color: #0f5e31; }
+@media (max-width: 900px) {
+  .wafloat { right: 14px; bottom: 14px; }
+  .mbar.show ~ .wafloat { bottom: 74px; }
+  .wa-btn { padding: 14px; }
+  .wa-lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce) { .wa-btn::after { animation: none; } .wafloat, .wa-btn { transition: none; } }
+@media print { .wafloat { display: none; } }
+
+/* ---------- one form, two modes (2026-11-02) ---------- */
+.pt-anchor { display: block; height: 0; }
+.mode-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 4px 0 18px; border: 1.5px solid var(--ink); border-radius: var(--radius); overflow: hidden; }
+.mode-tab { padding: 14px 10px; border: 0; background: transparent; color: var(--ink); font: 700 15px/1.2 var(--sans); cursor: pointer; transition: background .25s, color .25s; }
+.mode-tab + .mode-tab { border-left: 1.5px solid var(--ink); }
+.mode-tab:hover { background: var(--paper-2); }
+.mode-tab.is-on { background: var(--ink); color: var(--white); }
+.mode-tab:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
+.field[hidden] { display: none; }
