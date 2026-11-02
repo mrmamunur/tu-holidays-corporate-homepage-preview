@@ -515,3 +515,75 @@
 .mode-tab.is-on { background: var(--ink); color: var(--white); }
 .mode-tab:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
 .field[hidden] { display: none; }
+
+
+/* ---------- client reviews, redesign (2026-11-02) ----------
+   Dark ink section, text on the left, one large quote card on the right that changes by itself (progress line, dots, pause).
+   To undo: delete this block, restore _backup-2026-11-02/*before-reviews* and run build.py. */
+.rv-layout { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+.rv-side h2 { margin: 20px 0 20px; }
+.rv-side .lead { max-width: 34ch; }
+.rv-layout .rslider { max-width: none; margin: 0; position: relative; }
+.rslider .rcard { background: linear-gradient(160deg, rgba(255, 253, 248, .10), rgba(255, 253, 248, .04)); border: 1px solid rgba(227, 180, 34, .38); border-radius: 6px; color: var(--white); padding: clamp(30px, 4vw, 56px); box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.rslider .rcard::before { left: 28px; right: auto; top: -1px; width: 72px; height: 4px; background: var(--gold); }
+.rslider .rv-mark { font-size: 150px; line-height: .55; height: 62px; color: var(--gold); opacity: .95; }
+.rslider .rcard blockquote { margin: 6px 0 30px; }
+.rslider .rcard blockquote p { font-size: clamp(22px, 2.3vw, 31px); line-height: 1.38; color: var(--white); }
+.rslider .rcard figcaption { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px 18px; border-top: 1px solid rgba(255, 253, 248, .2); padding-top: 22px; }
+.rv-avatar { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: var(--ink); font: 700 19px/1 var(--serif); letter-spacing: .02em; box-shadow: 0 0 0 4px rgba(227, 180, 34, .25); }
+.rv-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rslider .rcard figcaption b { color: var(--white); font-size: 18px; }
+.rslider .rv-role { color: #d9dfd9; font-size: 16px; }
+.rslider .rv-src { color: #b7c0b8; font-size: 14px; margin-top: 4px; }
+.rv-logo-chip { background: #fff; padding: 6px 10px; border-radius: 3px; display: inline-flex; align-items: center; }
+.rv-logo { height: 30px; width: auto; display: block; }
+.rslider .rv-trip { grid-column: 1 / -1; margin-top: 14px; color: var(--gold); text-decoration-color: rgba(227, 180, 34, .5); }
+.rslider .rv-trip:hover { text-decoration-color: var(--gold); color: var(--white); }
+.rslider .rs-ctrl { justify-content: flex-start; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+.rslider .rs-btn { width: 48px; height: 48px; border-radius: 50%; border-color: rgba(255, 253, 248, .55); color: var(--white); font-size: 20px; }
+.rslider .rs-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.rslider .rs-btn:focus-visible { outline-color: var(--gold); }
+.rs-pause { font-size: 14px !important; margin-left: 4px; }
+.rs-pause[hidden] { display: none; }
+.rslider .rs-count { color: var(--white); min-width: 4em; font-size: 16px; }
+.rs-dots { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.rs-dot { width: 10px; height: 10px; padding: 0; border: 0; border-radius: 999px; background: rgba(255, 253, 248, .35); cursor: pointer; transition: width .3s, background .3s; }
+.rs-dot:hover { background: rgba(255, 253, 248, .7); }
+.rs-dot.is-on { width: 30px; background: var(--gold); }
+.rs-dot:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.rs-bar { height: 3px; margin-top: 20px; background: rgba(255, 253, 248, .16); border-radius: 2px; overflow: hidden; }
+.rs-bar i { display: block; width: 0; height: 100%; background: var(--gold); }
+.rslider:not(.is-ready) .rs-bar { display: none; }
+@media (max-width: 900px) {
+  .rv-layout { grid-template-columns: 1fr; }
+  .rv-side .lead { max-width: none; }
+  .rslider .rcard figcaption { grid-template-columns: auto minmax(0, 1fr); }
+  .rv-logo-chip { grid-column: 1 / -1; justify-self: start; margin-top: 8px; }
+  .rs-dots { margin-left: 0; width: 100%; }
+}
+
+
+/* ---------- mobile cleanup: ONE "Talk to us" hub (2026-11-02) ----------
+   Phones had the top bar buttons, a four-button bottom bar and a floating button all offering the same things. Now the top bar and bottom bar
+   are gone on phones; the single floating "Talk to us" button opens one panel: WhatsApp, Call, Set an appointment, Request A Proposal,
+   with an online/offline line from the office hours. To undo: delete this block and restore _backup-2026-11-02/*before-hub*. */
+@media (max-width: 900px) {
+  .topbar { display: none; }
+  .wafloat { right: 14px; bottom: 14px; }
+  .wa-btn { padding: 14px 20px 14px 16px; }
+  .wa-lbl { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+}
+.wa-dot { width: 10px; height: 10px; border-radius: 50%; background: #9aa39c; flex: none; box-shadow: 0 0 0 3px rgba(154, 163, 156, .25); }
+.wa-dot-btn { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border: 2px solid #fff; box-shadow: none; display: none; }
+.wafloat.is-online .wa-dot-btn { display: block; background: #3ddc84; }
+.wa-status { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.wa-status .wa-dot { margin-top: 6px; }
+.wa-status.is-open .wa-dot { background: #1fb860; box-shadow: 0 0 0 3px rgba(31, 184, 96, .28); animation: wa-live 2s ease-in-out infinite; }
+@keyframes wa-live { 50% { box-shadow: 0 0 0 7px rgba(31, 184, 96, 0); } }
+.wa-status b { display: block; font-family: var(--serif); font-weight: 500; font-size: 21px; line-height: 1.2; }
+.wa-status small { display: block; margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+.wa-panel .wa-opt { margin-top: 8px; padding: 12px 16px; }
+.wa-panel .wa-opt:first-of-type { margin-top: 0; }
+.wa-prop { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.wa-prop:hover, .wa-prop:focus-visible { background: var(--ink); border-color: var(--ink); color: var(--white); }
+@media (prefers-reduced-motion: reduce) { .wa-status.is-open .wa-dot { animation: none; } }

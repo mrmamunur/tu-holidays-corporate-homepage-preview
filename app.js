@@ -80,6 +80,26 @@
   // floating WhatsApp / appointment button: opens a small panel; Escape, outside click or a choice closes it
   var waBox = document.getElementById("wafloat");
   if (waBox) {
+    // "online now" from the office hours (Malaysia time, Mon-Fri 9:00 am to 6:30 pm); it shows office hours, not a live presence check
+    var waStatus = document.getElementById("wa-status");
+    var waState = function () {
+      var parts = {};
+      try {
+        new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kuala_Lumpur", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false })
+          .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+      } catch (e) { return; }
+      var day = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(parts.weekday), mins = parseInt(parts.hour, 10) * 60 + parseInt(parts.minute, 10);
+      var open = day >= 0 && day <= 4 && mins >= 540 && mins < 1110;
+      var next = "Monday";
+      if (day >= 0 && day <= 3 && mins >= 1110) next = "tomorrow"; else if ((day >= 0 && day <= 4) && mins < 540) next = "today"; else if (day === 4) next = "Monday";
+      if (!waStatus) return;
+      waStatus.classList.toggle("is-open", open); waStatus.classList.toggle("is-closed", !open);
+      waBox.classList.toggle("is-online", open);
+      waStatus.querySelector("b").textContent = open ? "We\u2019re online now" : "We\u2019re offline now";
+      waStatus.querySelector("small").textContent = open ? "Talk to us on WhatsApp or by phone, or set an appointment."
+        : "Back " + next + " at 9:00 am. Message us now and we reply within 24 hours on working days.";
+    };
+    waState(); setInterval(waState, 60000);
     var waBtn = waBox.querySelector(".wa-btn"), waPanel = document.getElementById("wa-panel");
     var waSet = function (open) {
       waPanel.hidden = !open; waBtn.setAttribute("aria-expanded", open ? "true" : "false"); waBox.classList.toggle("is-open", open);
@@ -105,15 +125,8 @@
   }
 
   // mobile action bar: appears after the hero, hides while the proposal form is on screen
-  var mbar = document.getElementById("mbar");
-  var propEl = document.getElementById("proposal");
-  var propVisible = false;
-  function mbarUpdate() { mbar.classList.toggle("show", window.scrollY > 520 && !propVisible); }
-  if (propEl && "IntersectionObserver" in window) {
-    new IntersectionObserver(function (en) { propVisible = en[0].isIntersecting; mbarUpdate(); }, { threshold: 0.15 }).observe(propEl);
-  }
-  window.addEventListener("scroll", mbarUpdate, { passive: true });
-  mbarUpdate();
+  // (the old mobile quick bar was replaced by the Talk to us button, 2026-11-02)
+
 
   // photo sliders (home hero, trip photos): next photograph every 3 seconds, no controls. Each pauses on hover/focus and while the
   // tab is hidden; visitors who prefer reduced motion keep the first photograph. Sliders start 0.7 s apart so they never change in step.
@@ -134,12 +147,46 @@
     setTimeout(play, n * 700);
   });
 
-  // client reviews: one review at a time in one column. Arrows, counter and swipe; no auto-change so visitors can read. Without JS they stack.
+  // client reviews: one review at a time, changing by itself every 3 seconds. It pauses while the visitor hovers, touches or focuses it,
+  // while the section is off screen or the tab is hidden. No stop button (his choice). Arrows, dots, keys and swipe also work.
+  // Visitors who prefer reduced motion get no automatic change. Without JavaScript all reviews simply stack in one column.
   document.querySelectorAll("[data-rslider]").forEach(function (box) {
     var slides = box.querySelectorAll(".rs-slide");
     if (slides.length < 2) return;
-    var cur = 0, counter = box.querySelector("[data-cur]");
+    var cur = 0, counter = box.querySelector("[data-cur]"), bar = box.querySelector(".rs-bar i"), dotsBox = box.querySelector(".rs-dots");
+    var pauseBtn = box.querySelector(".rs-pause"), auto = box.hasAttribute("data-autoplay") && !reduce;
+    var userPaused = false, hoverPaused = false, offscreen = false, hidden = false;
+    var timer = null, startedAt = 0, remaining = 0, total = 0, dots = [];
     box.classList.add("is-ready");
+    if (!auto && pauseBtn) pauseBtn.hidden = true;
+    var dwell = function () { return 3000; };   // every review stays 3 seconds (Mamunur, 2026-11-02)
+    if (dotsBox && slides.length <= 10) {
+      slides.forEach(function (s, i) {
+        var d = document.createElement("button"); d.type = "button"; d.className = "rs-dot"; d.setAttribute("aria-label", "Show review " + (i + 1));
+        d.addEventListener("click", function () { show(i); });
+        dotsBox.appendChild(d); dots.push(d);
+      });
+      dotsBox.removeAttribute("aria-hidden");
+    }
+    var barSet = function (pct, ms) {
+      if (!bar) return;
+      bar.style.transition = "none"; bar.style.width = pct + "%"; void bar.offsetWidth;
+      if (ms) { bar.style.transition = "width " + ms + "ms linear"; bar.style.width = "100%"; }
+    };
+    var paused = function () { return userPaused || hoverPaused || offscreen || hidden; };
+    var stop = function () {
+      if (!timer) return;
+      clearTimeout(timer); timer = null;
+      remaining = Math.max(400, remaining - (Date.now() - startedAt));
+      barSet(Math.min(100, 100 * (1 - remaining / total)), 0);
+    };
+    var go = function () {
+      if (!auto || timer || paused()) return;
+      startedAt = Date.now();
+      barSet(100 * (1 - remaining / total), remaining);
+      timer = setTimeout(function () { timer = null; show(cur + 1); }, remaining);
+    };
+    var restart = function () { stop(); total = remaining = dwell(cur); barSet(0, 0); go(); };
     var show = function (k) {
       cur = (k + slides.length) % slides.length;
       slides.forEach(function (s, i) {
@@ -149,22 +196,57 @@
         s.setAttribute("role", "group"); s.setAttribute("aria-roledescription", "review");
         s.setAttribute("aria-label", (i + 1) + " of " + slides.length);
       });
+      dots.forEach(function (d, i) { d.classList.toggle("is-on", i === cur); });
       if (counter) counter.textContent = cur + 1;
+      restart();
     };
     show(0);
-    box.querySelectorAll(".rs-btn").forEach(function (b) {
+    box.querySelectorAll(".rs-btn[data-dir]").forEach(function (b) {
       b.addEventListener("click", function () { show(cur + parseInt(b.getAttribute("data-dir"), 10)); });
     });
+    if (pauseBtn) pauseBtn.addEventListener("click", function () {
+      userPaused = !userPaused;
+      pauseBtn.firstElementChild.textContent = userPaused ? "▶" : "❚❚";
+      pauseBtn.setAttribute("aria-label", userPaused ? "Play automatic change" : "Pause automatic change");
+      box.classList.toggle("is-paused", userPaused);
+      if (userPaused) stop(); else go();
+    });
+    var lastTouch = 0;
+    box.addEventListener("mouseenter", function () { if (Date.now() - lastTouch < 800) return; hoverPaused = true; stop(); });   // ignore the mouse events phones fake after a tap
+    box.addEventListener("mouseleave", function () { hoverPaused = false; go(); });
+    box.addEventListener("focusin", function (e) { if (e.target.matches && e.target.matches(":focus-visible")) { hoverPaused = true; stop(); } });   // keyboard focus only
+    box.addEventListener("focusout", function () { hoverPaused = false; go(); });
+    document.addEventListener("visibilitychange", function () { hidden = document.hidden; if (hidden) stop(); else go(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { offscreen = !en[0].isIntersecting; if (offscreen) stop(); else go(); }, { threshold: 0.25 }).observe(box);
+    }
     box.addEventListener("keydown", function (e) {
       if (e.key === "ArrowLeft") show(cur - 1); else if (e.key === "ArrowRight") show(cur + 1);
     });
-    var x0 = null;
-    box.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
-    box.addEventListener("touchend", function (e) {
+    // finger: drag the review sideways to see the next or previous one (the card follows the finger); a short drag snaps back; up/down still scrolls the page
+    var x0 = null, y0 = 0, dx = 0, dragging = false;
+    var release = function (go2) {
+      var s = slides[cur];
+      s.style.transition = ""; s.style.transform = ""; s.style.opacity = "";
+      var moved = dragging && Math.abs(dx) > 60;
+      x0 = null; dragging = false;
+      if (moved && go2) { hoverPaused = false; show(cur + (dx < 0 ? 1 : -1)); return; }
+      setTimeout(function () { hoverPaused = false; go(); }, 1200);
+    };
+    box.addEventListener("touchstart", function (e) { lastTouch = Date.now(); x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; dragging = false; hoverPaused = true; stop(); }, { passive: true });
+    box.addEventListener("touchmove", function (e) {
       if (x0 === null) return;
-      var dx = e.changedTouches[0].clientX - x0; x0 = null;
-      if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1));
+      lastTouch = Date.now();
+      dx = e.touches[0].clientX - x0;
+      var dy = e.touches[0].clientY - y0;
+      if (!dragging && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) dragging = true;
+      if (dragging) {
+        var s = slides[cur];
+        s.style.transition = "none"; s.style.transform = "translateX(" + dx + "px)"; s.style.opacity = String(Math.max(0.25, 1 - Math.abs(dx) / 320));
+      }
     }, { passive: true });
+    box.addEventListener("touchend", function () { lastTouch = Date.now(); if (x0 !== null) release(true); }, { passive: true });
+    box.addEventListener("touchcancel", function () { if (x0 !== null) release(false); }, { passive: true });
   });
 
   // client-logo strip: static centred row while the logos fit; when they do not, a slow looping rail (pauses on hover, off for reduced motion)
